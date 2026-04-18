@@ -1,0 +1,6 @@
+ktor:
+  application:
+    modules:
+      - pl.cube.planning_poker.ApplicationKt.module
+  deployment:
+    port: 8080
