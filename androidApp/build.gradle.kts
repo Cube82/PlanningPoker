@@ -36,7 +36,7 @@ android {
 
 dependencies {
     implementation(projects.composeApp)
-    implementation(compose.preview)
+    implementation(libs.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
-    debugImplementation(compose.uiTooling)
+    debugImplementation(libs.ui.tooling)
 }

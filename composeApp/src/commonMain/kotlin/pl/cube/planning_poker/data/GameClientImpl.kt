@@ -1,7 +1,6 @@
 package pl.cube.planning_poker.data
 
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.url
 import io.ktor.websocket.*
@@ -63,7 +62,7 @@ class GameClientImpl(
         ensureSession()
             .outgoing
             .trySend(Frame.Text(Json.encodeToString(message)))
-            ?.onClosed {
+            .onClosed {
                 Logger.d("Can not send: the channel is closed")
                 sessionMutex.withLock {
                     session = null

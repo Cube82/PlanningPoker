@@ -100,7 +100,3 @@ class Game {
         message.value = MessageState.NoOp
     }
 }
-
-fun selectCard(player: Player, value: Int) {
-    //todo check if possible
-}

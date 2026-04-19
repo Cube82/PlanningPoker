@@ -1,6 +1,6 @@
 package pl.cube.planning_poker.net
 
 internal actual object BackendConfig {
-    // 10.0.2.2 maps the host machine loopback to the Android emulator.
-    actual val webSocketUrl: String = "ws://10.0.2.2:8080/table"
+    // With `adb reverse tcp:8080 tcp:8080`, Android can reach local backend via loopback.
+    actual val webSocketUrl: String = "ws://127.0.0.1:8080/table"
 }

@@ -174,6 +174,20 @@ Use:
 
 Run it on an emulator or device.
 
+#### Android local backend note
+
+For Android local development, the app is configured to use:
+
+- `ws://127.0.0.1:8080/table`
+
+Before starting the Android app against a locally running backend, run:
+
+```powershell
+adb reverse tcp:8080 tcp:8080
+```
+
+This forwards emulator or device port `8080` to port `8080` on the development machine, which is the most reliable setup for newer Android target SDK versions.
+
 ### 3. Optional server configuration in Android Studio
 
 Type:
@@ -237,6 +251,18 @@ Fix:
 - try `./gradlew :server:run --continuous` if plain `:server:run` behaves worse
 - if Gradle still blocks other targets, run the server outside Gradle with `installDist`
 - if IDE-based `Application` launch behaves well on your machine, that is also a valid option
+
+### Android emulator cannot connect to local backend
+
+Recommended fix:
+
+```powershell
+adb reverse tcp:8080 tcp:8080
+```
+
+The Android client uses `127.0.0.1:8080` for local development, so `adb reverse` must be active before starting the app.
+
+This setup is preferred over `10.0.2.2` for newer Android target SDK levels.
 
 ## Current Status
 
