@@ -6,4 +6,6 @@ import pl.cube.planning_poker.helpers.PlayerNameValidationError
 @Stable
 internal data class LobbyUiState(
     val playerNameError: PlayerNameValidationError? = null,
+    val selectedTableId: String? = null,
+    val availableTables: List<String> = emptyList(),
 )

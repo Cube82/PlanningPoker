@@ -11,8 +11,12 @@ import pl.cube.planning_poker.helpers.PlayerNameValidator
 import pl.cube.planning_poker.helpers.ValidateStatus
 import pl.cube.planning_poker.logger.Logger
 import pl.cube.planning_poker.models.client.JoinTable
-import pl.cube.planning_poker.models.server.GameState
+import pl.cube.planning_poker.models.client.ResetRound
+import pl.cube.planning_poker.models.client.RevealCards
+import pl.cube.planning_poker.models.client.SelectCard
+import pl.cube.planning_poker.models.server.PlanningCard
 import pl.cube.planning_poker.models.server.ServerError
+import pl.cube.planning_poker.models.server.TableState
 import pl.cube.planning_poker.navi.Destination
 import pl.cube.planning_poker.navi.Navigator
 
@@ -50,26 +54,31 @@ internal class TableViewModel(
         }
         .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
 
-    val gameState = serverMessages
-        .filterIsInstance<GameState>()
+    val tableState = serverMessages
+        .filterIsInstance<TableState>()
         .onEach {
             Logger.d("connected")
             _uiState.update { it.copy(connectionState = ConnectionState.Joined) }
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, GameState())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, TableState())
     private val thisRoute = savedState.toRoute<Destination.Table>()
-    private val playerName = thisRoute.player
+    private val playerName = thisRoute.player.orEmpty()
+    private val tableId = thisRoute.tableId
 
     init {
         _uiState.value = _uiState.value.copy(tmp = playerName)
 
-        serverMessages
-            .filterIsInstance<ServerError>()
-            .onEach(::handleServerError)
-            .launchIn(viewModelScope)
+        if (playerName.isBlank()) {
+            goToLobby()
+        } else {
+            serverMessages
+                .filterIsInstance<ServerError>()
+                .onEach(::handleServerError)
+                .launchIn(viewModelScope)
 
-        if (isPlayerNameValid()) {
-            joinTable()
+            if (isPlayerNameValid()) {
+                joinTable()
+            }
         }
     }
 
@@ -91,16 +100,37 @@ internal class TableViewModel(
     }
 
     fun joinTable() {
-        viewModelScope.launch {
-            Logger.d("joining table")
-            client.sendMessage(JoinTable(playerName, "some id"))
+        runClientAction("joining table") {
+            client.sendMessage(JoinTable(playerName, tableId))
+        }
+    }
+
+    fun selectCard(card: PlanningCard) {
+        runClientAction("selecting card $card") {
+            client.sendMessage(SelectCard(card))
+        }
+    }
+
+    fun revealCards() {
+        runClientAction("revealing cards") {
+            client.sendMessage(RevealCards)
+        }
+    }
+
+    fun resetRound() {
+        runClientAction("resetting round") {
+            client.sendMessage(ResetRound)
         }
     }
 
     fun leaveTable() {
         viewModelScope.launch {
             Logger.d("leaving table")
-            client.close()
+            try {
+                client.close()
+            } catch (e: Exception) {
+                Logger.e("error closing table", e)
+            }
         }
     }
 
@@ -118,11 +148,40 @@ internal class TableViewModel(
         }
     }
 
+    private fun handleConnectionProblem(exception: Exception) {
+        Logger.e("connection problem", exception)
+        _uiState.update {
+            it.copy(
+                connectionState = ConnectionState.Error,
+                alert = AlertUiState(
+                    kind = TableAlertKind.ConnectionProblem(
+                        fallbackMessage = exception.message ?: "",
+                    ),
+                    onConfirm = ::goToLobby,
+                ),
+            )
+        }
+    }
+
+    private fun runClientAction(
+        logMessage: String,
+        action: suspend () -> Unit,
+    ) {
+        viewModelScope.launch {
+            Logger.d(logMessage)
+            try {
+                action()
+            } catch (e: Exception) {
+                handleConnectionProblem(e)
+            }
+        }
+    }
+
     private fun goToLobby() {
         _uiState.value = _uiState.value.copy(alert = null)
         viewModelScope.launch {
             navigate(
-                destination = Destination.Lobby,
+                destination = Destination.Lobby(tableId = tableId),
                 options = {
                     popUpTo(thisRoute) {
                         inclusive = true

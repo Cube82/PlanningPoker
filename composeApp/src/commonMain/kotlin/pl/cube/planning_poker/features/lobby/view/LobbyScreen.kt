@@ -26,7 +26,10 @@ internal fun LobbyScreen(viewModel: LobbyViewModel = koinViewModel()) {
     LobbyLayout(
         playerName = viewModel.playerName,
         playerNameError = state.playerNameError,
+        selectedTableId = state.selectedTableId,
+        availableTables = state.availableTables,
         updatePlayerName = viewModel::updatePlayerName,
+        selectTable = viewModel::selectTable,
         onJoinTableClick = viewModel::joinTable,
     )
 }
@@ -35,9 +38,21 @@ internal fun LobbyScreen(viewModel: LobbyViewModel = koinViewModel()) {
 internal fun LobbyLayout(
     playerName: String,
     playerNameError: PlayerNameValidationError?,
+    selectedTableId: String?,
+    availableTables: List<String>,
     updatePlayerName: (String) -> Unit,
+    selectTable: (String) -> Unit,
     onJoinTableClick: () -> Unit,
 ) {
+    val needsPlayerName = playerName.isBlank() || playerNameError != null
+    val needsTable = selectedTableId.isNullOrBlank()
+    var playerNameInput by remember(playerName) { mutableStateOf(playerName) }
+
+    fun submitPlayerName() {
+        updatePlayerName(playerNameInput)
+        onJoinTableClick()
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -54,31 +69,60 @@ internal fun LobbyLayout(
 
                 Spacer(Modifier.size(dimen16))
 
-                OutlinedTextField(
-                    value = playerName,
-                    onValueChange = updatePlayerName,
-                    modifier = Modifier.fillMaxWidth().onKeyEvent { event ->
-                            if (event.key.keyCode == Key.Enter.keyCode) {
-                                onJoinTableClick()
-                                true
-                            } else {
-                                false
+                if (needsPlayerName) {
+                    OutlinedTextField(
+                        value = playerNameInput,
+                        onValueChange = { playerNameInput = it },
+                        modifier = Modifier.fillMaxWidth().onKeyEvent { event ->
+                                if (event.key.keyCode == Key.Enter.keyCode) {
+                                    submitPlayerName()
+                                    true
+                                } else {
+                                    false
+                                }
+                            },
+                        label = { Text(stringResource(Res.string.lobby_player_name_label)) },
+                        supportingText = {
+                            playerNameError?.let { error ->
+                                Text(error.toMessage())
                             }
                         },
-                    label = { Text(stringResource(Res.string.lobby_player_name_label)) },
-                    supportingText = {
-                        playerNameError?.let { error ->
-                            Text(error.toMessage())
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onJoinTableClick() }),
-                    isError = playerNameError != null,
-                    singleLine = true,
-                )
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { submitPlayerName() }),
+                        isError = playerNameError != null,
+                        singleLine = true,
+                    )
 
-                Button(onClick = onJoinTableClick) {
-                    Text(stringResource(Res.string.lobby_join_button))
+                    Spacer(Modifier.size(dimen16))
+                } else {
+                    Text(stringResource(Res.string.lobby_selected_player, playerName))
+                    Spacer(Modifier.size(dimen16))
+                }
+
+                if (needsTable) {
+                    Text(
+                        text = stringResource(Res.string.lobby_table_label),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Spacer(Modifier.size(dimen16))
+                    availableTables.forEach { tableId ->
+                        Button(
+                            onClick = { selectTable(tableId) },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(stringResource(Res.string.lobby_table_option, tableId))
+                        }
+                        Spacer(Modifier.size(dimen16))
+                    }
+                } else {
+                    Text(stringResource(Res.string.lobby_selected_table, selectedTableId))
+                    Spacer(Modifier.size(dimen16))
+                }
+
+                if (needsPlayerName) {
+                    Button(onClick = ::submitPlayerName) {
+                        Text(stringResource(Res.string.lobby_join_button))
+                    }
                 }
             }
         }

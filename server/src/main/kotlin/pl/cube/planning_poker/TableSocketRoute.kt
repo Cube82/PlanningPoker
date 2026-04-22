@@ -6,10 +6,13 @@ import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.serialization.json.Json
 import pl.cube.planning_poker.game.Game
 import pl.cube.planning_poker.models.client.ClientMessage
 import pl.cube.planning_poker.models.client.JoinTable
+import pl.cube.planning_poker.models.client.ResetRound
+import pl.cube.planning_poker.models.client.RevealCards
+import pl.cube.planning_poker.models.client.SelectCard
+import pl.cube.planning_poker.models.ProtocolJson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -23,12 +26,31 @@ fun Route.tableSocket(game: Game) {
                     if (frame is Frame.Text) {
                         val serializedMessage = frame.readText()
                         Logger.d("received: $serializedMessage")
-                        val message = Json.decodeFromString<ClientMessage>(serializedMessage)
-                        if (message is JoinTable) {
-                            Logger.d("user ${message.userName} connecting")
-                            game.connectPlayer(playerId, message.userName, message.tableId, this)
-                        } else {
-                            Logger.d("got other message")
+                        val message = ProtocolJson.instance.decodeFromString<ClientMessage>(serializedMessage)
+                        when (message) {
+                            is JoinTable -> {
+                                Logger.d("user ${message.userName} connecting")
+                                game.connectPlayer(playerId, message.userName, message.tableId, this)
+                            }
+
+                            is SelectCard -> {
+                                Logger.d("user $playerId voting")
+                                game.submitVote(playerId, message.card)
+                            }
+
+                            RevealCards -> {
+                                Logger.d("user $playerId revealing")
+                                game.revealCards(playerId)
+                            }
+
+                            ResetRound -> {
+                                Logger.d("user $playerId resetting round")
+                                game.resetRound(playerId)
+                            }
+
+                            else -> {
+                                Logger.d("got other message")
+                            }
                         }
                     }
                 }

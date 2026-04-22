@@ -13,7 +13,7 @@ import pl.cube.planning_poker.net.httpClient
 
 val appModule = module {
     single<Navigator> {
-        ComposeNavigator(startDestination = Destination.Lobby)
+        ComposeNavigator(startDestination = Destination.Lobby())
     }
 
     single<PlayerNameValidator> { PlayerNameValidator() }

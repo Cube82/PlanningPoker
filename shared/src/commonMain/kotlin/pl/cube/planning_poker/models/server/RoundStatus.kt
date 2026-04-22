@@ -4,8 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("gameState")
-data class GameState(
-    @SerialName("players")
-    val players: List<Player> = emptyList(),
-) : ServerMessage
+enum class RoundStatus {
+    @SerialName("voting")
+    Voting,
+
+    @SerialName("revealed")
+    Revealed,
+}

@@ -28,4 +28,5 @@ internal data class AlertUiState(
 internal sealed interface TableAlertKind {
     data class InvalidPlayerName(val reason: PlayerNameValidationError) : TableAlertKind
     data class ServerProblem(val code: ServerErrorCode, val fallbackMessage: String) : TableAlertKind
+    data class ConnectionProblem(val fallbackMessage: String) : TableAlertKind
 }

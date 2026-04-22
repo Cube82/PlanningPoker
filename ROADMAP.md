@@ -13,48 +13,56 @@ The project now has:
 - typed validation and server error handling instead of raw UI strings in key flows
 - explicit connection states in the table screen
 - visible join failures in UI instead of silent no-op behavior
-- shared-session multiplayer working between `web + web` and `web + android`
+- multiplayer working between `web + web` and `web + android`
 - disconnect triggered when leaving the table screen, not only when the whole app dies
+- shared table / round model with host, voting state, reveal, and reset flow
+- snapshot-based WebSocket protocol with typed client and server messages
+- lobby flow that can prefill and validate player name and table id from navigation / URL
 
-The project still does not implement actual Planning Poker gameplay. The next product goal after the clean baseline commit is to move from shared session presence to real round logic.
+The project now covers most of MVP Stage 1 and Stage 2. The next product goal is Stage 3: improve UI / UX clarity and make the MVP feel intentional instead of merely functional.
 
 ## MVP Plan
 
 ### Stage 1. Model the Planning Poker domain
 
-Goal: replace the current `GameState(players)` model with a real estimation round model.
+Goal: replace the old presence-only model with a real estimation round model.
 
-Scope:
+Status:
 
-- introduce table model, round model, deck model, and round status
-- add player states such as joined, voted, revealed, and observer
-- extend client-server messages to support game actions
-- define the MVP deck, for example Fibonacci plus `?`
+- mostly complete
 
-Definition of done:
+Implemented scope:
 
-- `shared` contains the full MVP contract
-- client and server use the same models without local workarounds
+- shared table model, round model, deck definition, and round status
+- player voting states and host role
+- shared client-server actions for join, vote, reveal, and reset
+- MVP Fibonacci-style deck plus `?`
+
+Remaining notes:
+
+- observer mode is still intentionally deferred
+- table configuration is still minimal
 
 ### Stage 2. Implement MVP gameplay
 
 Goal: deliver a complete Planning Poker round.
 
-Scope:
+Status:
 
-- create or choose a table
+- mostly complete
+
+Implemented scope:
+
 - join a specific table
 - select a card as a player
 - keep cards hidden until reveal
-- reveal cards as the host
-- reset the round
+- reveal cards for the table
+- reset the round and start the next one
 
-Definition of done:
+Remaining notes:
 
-- 2+ clients can join the same session
-- every participant can vote
-- reveal shows the result to everyone
-- reset clears the votes and starts the next round
+- there is still only one real table behind the scenes
+- create-table flow and true multi-table server state are still future work
 
 ### Stage 3. Improve UX and clarity
 
@@ -62,46 +70,31 @@ Goal: make the MVP pleasant to use, not just technically functional.
 
 Scope:
 
-- show a readable list of players and voting statuses
-- build a card selection UI that works on phone and browser layouts
-- improve error, empty, and reconnect states
-- remove temporary debug-like controls from the table screen
+- show a clearer list of players and voting states
+- improve lobby flow and table entry clarity on both Android and Web
+- refine card selection UI for phone and browser layouts
+- improve empty, reconnect, and error states
+- remove remaining temporary / debug-like UX
 
 Definition of done:
 
 - a user can understand what to do next without explanation
-- the main flow does not depend on temporary debug buttons
+- main flow feels coherent on both Android and Web
+- table entry via direct URL behaves predictably
 
-### Stage 4. Add tests and stabilization
+## Post-MVP Growth Plan
 
-Goal: protect the most important behavior from regressions.
-
-Scope:
+### Stabilization
 
 - unit tests for validation and game rules
 - server tests for WebSocket message handling
 - ViewModel tests for the main app flows
-
-Definition of done:
-
-- key game rules are covered by tests
-- main protocol errors are detected automatically
-
-## Suggested Next Tasks After Initial Commit
-
-1. Replace `GameState(players)` with a shared table / round model in `shared`.
-2. Define MVP actions such as vote, reveal, and reset in shared client-server contracts.
-3. Refactor server `Game` from participant registry into real table-round logic.
-4. Rebuild `TableViewModel` around full gameplay state instead of only connection + player list.
-5. Replace temporary table UI with player cards, voting states, and host actions.
-6. Add first automated tests for shared rules and server protocol handling.
-
-## Post-MVP Growth Plan
+- regression protection for key protocol errors and game rules
 
 ### Version 1.1
 
 - multiple tables with room codes
-- host / moderator privileges
+- host / moderator privileges beyond current MVP defaults
 - rename and rejoin flow
 - better reconnect handling
 

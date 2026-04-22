@@ -12,25 +12,24 @@ The short-term priority is to deliver a small, working MVP first, and only then 
 
 ## Current Repository State
 
-The project already has a working multiplayer baseline:
+The project already has a working multiplayer MVP baseline:
 
-- lobby screen with player name validation
-- navigation from lobby to table screen
+- lobby flow with player name validation
+- navigation and URL-driven entry from lobby to a specific table
 - WebSocket communication between client and server
-- server-side player registration
-- shared `GameState` broadcast to connected clients
-- typed shared server error contracts in `shared`
+- shared snapshot-based table state broadcast
+- shared typed contracts for client actions and server errors
+- table / round model with host, hidden votes, reveal, and reset
 - explicit connection state in table UI
 - visible join failures instead of silent no-op behavior
 - leave-table behavior when the table screen is dismissed
 
-Main gaps compared to the final Planning Poker MVP:
+Main gaps compared to the full Planning Poker product:
 
-- no estimation round model yet
-- no card selection, reveal, or reset flow yet
-- no host / moderator round actions yet
-- no support for multiple independent tables yet
-- no automated tests for domain logic or protocol behavior yet
+- UI / UX still needs polish and clearer guidance
+- server still behaves like one real in-memory table with a validated known-table list, not full dynamic multi-table management
+- reconnect and recovery behavior are still lightly tested and mostly verified manually
+- server logic and protocol flow still have no automated tests
 
 ## Architecture
 
@@ -40,24 +39,24 @@ Main gaps compared to the final Planning Poker MVP:
 - platform-specific client implementations live in `androidMain` and `wasmJsMain`
 - dependency injection uses Koin
 - current screen flow is `LobbyScreen` -> `TableScreen`
+- lobby is responsible for collecting missing `playerName` and `tableId` before entering `TableScreen`
 
 ### `shared`
 
 - contains serializable models using `kotlinx.serialization`
-- this is the right place for WebSocket contracts, domain types, and shared protocol-level logic
+- this is the right place for WebSocket contracts, domain types, deck definitions, and shared protocol-level logic
 
 ### `server`
 
 - backend is built with Ktor + WebSockets
 - game state is kept in memory inside `Game`
-- current implementation manages player presence and shared state broadcast
+- current implementation handles one real game instance plus validation against known table ids
 
 ## Current Technical Risks
 
-- `GameState` is still too small for real Planning Poker gameplay
 - `GameClientImpl` still owns a single active WebSocket session, which may complicate reconnect and tests later
+- server-side table management is still not a true map of independent tables
 - disconnect and reconnect behavior is improved, but still lightly tested and mostly verified manually
-- some localization files still use temporary ASCII-safe Polish text because of previous encoding issues
 - server logic and protocol flow still have no automated tests
 
 ## Working Rules For This Repo
@@ -100,14 +99,18 @@ Everything beyond that is product growth, not an MVP blocker.
 - Server run: `./gradlew :server:run`
 - Full build: `./gradlew build`
 
+Note:
+
+- the Web/Wasm dev task is long-running after startup; do not treat it like a quick terminating verification command
+
 ## Direction After MVP
 
+- UI / UX polish and responsiveness improvements
 - multiple tables and join-by-room-code flow
-- host / Scrum Master role
+- host / Scrum Master role expansion
 - round history and helper statistics
 - reconnect after connection loss
 - local or remote session persistence
-- better design and mobile/web responsiveness
 - automated tests for protocol and game logic
 
 ## How To Make Decisions

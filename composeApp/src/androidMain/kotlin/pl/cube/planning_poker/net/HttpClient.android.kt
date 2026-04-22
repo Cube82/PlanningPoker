@@ -6,17 +6,13 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
-import kotlinx.serialization.json.Json
+import pl.cube.planning_poker.models.ProtocolJson
 
 actual fun httpClient(config: HttpClientConfig<*>.() -> Unit) = HttpClient(OkHttp) {
     config(this)
 
     install(Logging)
     install(WebSockets) {
-        contentConverter = KotlinxWebsocketSerializationConverter(Json {
-            prettyPrint = true
-            isLenient = true
-            ignoreUnknownKeys = true
-        })
+        contentConverter = KotlinxWebsocketSerializationConverter(ProtocolJson.instance)
     }
 }

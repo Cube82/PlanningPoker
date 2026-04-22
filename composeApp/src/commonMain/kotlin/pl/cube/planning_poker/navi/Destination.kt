@@ -6,9 +6,15 @@ import kotlinx.serialization.Serializable
 internal sealed interface Destination {
     @Serializable
     @SerialName("lobby")
-    data object Lobby : Destination
+    data class Lobby(
+        val player: String? = null,
+        val tableId: String? = null,
+    ) : Destination
 
     @Serializable
     @SerialName("table")
-    data class Table(val player: String) : Destination
+    data class Table(
+        val tableId: String,
+        val player: String? = null,
+    ) : Destination
 }

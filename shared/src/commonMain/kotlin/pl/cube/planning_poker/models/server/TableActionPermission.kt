@@ -4,9 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("player")
-data class Player(
-    val name: String,
-    val playerId: String,
-    val tableId: String,
-)
+enum class TableActionPermission {
+    @SerialName("hostOnly")
+    HostOnly,
+
+    @SerialName("anyone")
+    Anyone,
+}

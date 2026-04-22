@@ -40,7 +40,8 @@ Shared domain and protocol layer:
 
 - serializable messages
 - server/client contracts
-- shared platform abstractions
+- shared table and round models
+- shared deck and known-table definitions
 
 ### `server`
 
@@ -61,6 +62,7 @@ If Gradle cannot find Java, make sure `JAVA_HOME` points to a valid JDK.
 ## Build Commands
 
 - Android app: `./gradlew :androidApp:assembleDebug`
+- Android install with local backend reverse: `./gradlew :androidApp:installDebug`
 - Web app: `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
 - Server compile: `./gradlew :server:compileKotlin`
 - Server run: `./gradlew :server:run`
@@ -180,13 +182,19 @@ For Android local development, the app is configured to use:
 
 - `ws://127.0.0.1:8080/table`
 
-Before starting the Android app against a locally running backend, run:
+For terminal installs, use:
 
 ```powershell
-adb reverse tcp:8080 tcp:8080
+./gradlew :androidApp:installDebug
 ```
 
-This forwards emulator or device port `8080` to port `8080` on the development machine, which is the most reliable setup for newer Android target SDK versions.
+This task runs `adb reverse tcp:8080 tcp:8080` before install.
+
+For Android Studio `Android App` run configuration, add a `Before launch` Gradle task:
+
+- `:androidApp:adbReverseLocalBackend`
+
+This is needed because the standard IDE deploy path does not automatically run Gradle install tasks.
 
 ### 3. Optional server configuration in Android Studio
 
@@ -238,6 +246,21 @@ Then create a `Remote JVM Debug` configuration in Android Studio and attach to:
 
 This option is useful if you want debugging without tying the server lifecycle to Gradle.
 
+## Direct Table URLs
+
+The app supports table-first links.
+
+Examples:
+
+- `http://localhost:8081/#table/main`
+- `http://localhost:8081/#table/main/Alice`
+
+Behavior:
+
+- if `tableId` is present but `player` is missing, app redirects to lobby with that table preselected
+- if both are present, app tries to enter the table directly
+- unknown table ids are rejected
+
 ## Troubleshooting
 
 ### Web or Android waits forever after server is started through Gradle
@@ -254,26 +277,36 @@ Fix:
 
 ### Android emulator cannot connect to local backend
 
-Recommended fix:
+Use one of these:
 
-```powershell
-adb reverse tcp:8080 tcp:8080
-```
+- `./gradlew :androidApp:installDebug`
+- Android Studio `Before launch` Gradle task: `:androidApp:adbReverseLocalBackend`
 
 The Android client uses `127.0.0.1:8080` for local development, so `adb reverse` must be active before starting the app.
 
-This setup is preferred over `10.0.2.2` for newer Android target SDK levels.
+### App closes when backend is unavailable
+
+Current behavior:
+
+- table entry should now surface a connection error in UI instead of crashing
+
+If it still closes:
+
+- check Logcat for the first thrown exception
+- verify server is reachable on port `8080`
+- verify `adb reverse tcp:8080 tcp:8080` is active for Android local development
 
 ## Current Status
 
-Current baseline includes:
+Current MVP baseline includes:
 
-- lobby screen with player name validation
-- table screen with shared participant list
-- WebSocket communication between client and server
-- visible join failures in UI
+- lobby flow with player name validation
+- table-aware navigation and direct table URLs
+- shared snapshot-based WebSocket protocol
+- join, vote, reveal, and reset round flow
+- host-only reveal and reset by default
+- visible join and connection failures in UI
 - explicit connection state in table UI
-- typed shared protocol errors for join flow
 - leave-table behavior when the table screen is dismissed
 
-Planning Poker gameplay itself is still in progress.
+UI and UX polish are still in progress.

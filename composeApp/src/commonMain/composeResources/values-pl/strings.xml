@@ -4,12 +4,26 @@
     <string name="lobby_player_name_label">Nazwa gracza</string>
     <string name="lobby_join_button">Dołącz</string>
     <string name="lobby_player_name_error_invalid_length">Nazwa gracza musi mieć od 3 do 20 znaków</string>
+    <string name="lobby_table_label">Wybierz stół</string>
+    <string name="lobby_table_option">Stół: %1$s</string>
+    <string name="lobby_selected_player">Gracz: %1$s</string>
+    <string name="lobby_selected_table">Stół: %1$s</string>
 
     <string name="table_title">Stół</string>
-    <string name="table_join_button">Dołącz do stołu</string>
     <string name="table_alert_invalid_player_title">Błąd</string>
     <string name="table_alert_invalid_player_button">OK</string>
+    <string name="table_alert_connection_problem">Nie udało się połączyć z serwerem</string>
     <string name="table_alert_server_user_name_taken">Nazwa gracza jest już zajęta</string>
+    <string name="table_alert_server_table_not_found">Stół nie istnieje</string>
+    <string name="table_round_label">Runda %1$d</string>
+    <string name="table_my_vote_label">Mój głos: %1$s</string>
+    <string name="table_no_vote">-</string>
+    <string name="table_host_suffix"> (host)</string>
+    <string name="table_player_status_not_voted">nie głosował</string>
+    <string name="table_player_status_voted">zagłosował</string>
+    <string name="table_player_row">%1$s%2$s - %3$s</string>
+    <string name="table_reveal_button">Odkryj</string>
+    <string name="table_reset_button">Reset rundy</string>
 
     <string name="connection_state_idle">Bezczynny</string>
     <string name="connection_state_connecting">Łączenie</string>

@@ -4,7 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@SerialName("playerJoined")
-data class PlayerJoined(
-    val playerId: String,
-) : ServerMessage
+enum class PlayerRole {
+    @SerialName("host")
+    Host,
+
+    @SerialName("participant")
+    Participant,
+}

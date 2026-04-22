@@ -7,4 +7,7 @@ import kotlinx.serialization.Serializable
 enum class ServerErrorCode {
     @SerialName("join:userNameTaken")
     UserNameTaken,
+
+    @SerialName("join:tableNotFound")
+    TableNotFound,
 }

@@ -8,9 +8,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.channels.onClosed
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.json.Json
 import pl.cube.planning_poker.logger.Logger
 import pl.cube.planning_poker.models.client.ClientMessage
+import pl.cube.planning_poker.models.ProtocolJson
 import pl.cube.planning_poker.models.server.ServerMessage
 import pl.cube.planning_poker.net.BackendConfig
 
@@ -36,7 +36,7 @@ class GameClientImpl(
                         }
                         is Frame.Text -> {
                             Logger.d("got ${frame.readText()}")
-                            Json.decodeFromString<ServerMessage>(frame.readText())
+                            ProtocolJson.instance.decodeFromString<ServerMessage>(frame.readText())
                         }
                         else -> {
                             Logger.e("wrong frame type")
@@ -61,7 +61,11 @@ class GameClientImpl(
     override suspend fun sendMessage(message: ClientMessage) {
         ensureSession()
             .outgoing
-            .trySend(Frame.Text(Json.encodeToString(message)))
+            .trySend(
+                Frame.Text(
+                    ProtocolJson.instance.encodeToString<ClientMessage>(message)
+                )
+            )
             .onClosed {
                 Logger.d("Can not send: the channel is closed")
                 sessionMutex.withLock {

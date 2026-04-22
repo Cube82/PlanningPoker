@@ -9,10 +9,13 @@ import pl.cube.planning_poker.preview.DefaultPreview
 private fun LobbyScreenPreview() {
     DefaultPreview {
         LobbyLayout(
-            "",
-            null,
-            {},
-            {},
+            playerName = "",
+            playerNameError = null,
+            selectedTableId = null,
+            availableTables = listOf("main"),
+            updatePlayerName = {},
+            selectTable = {},
+            onJoinTableClick = {},
         )
     }
 }
