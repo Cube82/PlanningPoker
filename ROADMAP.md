@@ -11,15 +11,19 @@ The project now has:
 - platform-aware backend WebSocket configuration for Android emulator and Web
 - localized UI strings moved into Compose Multiplatform resources for core lobby/table screens
 - typed validation and server error handling instead of raw UI strings in key flows
-- explicit connection states in the table screen
+- explicit connection states in the table top bar
 - visible join failures in UI instead of silent no-op behavior
 - multiplayer working between `web + web` and `web + android`
 - disconnect triggered when leaving the table screen, not only when the whole app dies
-- shared table / round model with host, voting state, reveal, and reset flow
+- shared table / round model with host, voting state, card unselect, missed-vote state, reveal, and reset flow
 - snapshot-based WebSocket protocol with typed client and server messages
 - lobby flow that can prefill and validate player name and table id from navigation / URL
+- responsive table UI for phone and browser widths
+- reusable card and player-list UI with hidden, selected, disabled, focused, hovered, revealed, and missed-vote states
+- light / dark theme colors, Inter font, Material icons, and third-party asset notices
+- feature-local preview fixtures for reusable UI states
 
-The project now covers most of MVP Stage 1 and Stage 2. The next product goal is Stage 3: improve UI / UX clarity and make the MVP feel intentional instead of merely functional.
+The project now covers most of MVP Stage 1 and Stage 2. Stage 3 is partly complete: the table UI is much more intentional, while error, empty, and recovery flows still need attention.
 
 ## MVP Plan
 
@@ -36,7 +40,9 @@ Implemented scope:
 - shared table model, round model, deck definition, and round status
 - player voting states and host role
 - shared client-server actions for join, vote, reveal, and reset
+- explicit unselect-card action
 - MVP Fibonacci-style deck plus `?`
+- public vote state distinguishes not voted, voted hidden, revealed, and missed vote after reveal
 
 Remaining notes:
 
@@ -55,8 +61,10 @@ Implemented scope:
 
 - join a specific table
 - select a card as a player
+- unselect the selected card by clicking it again
 - keep cards hidden until reveal
 - reveal cards for the table
+- show players who missed the vote after reveal
 - reset the round and start the next one
 
 Remaining notes:
@@ -68,6 +76,10 @@ Remaining notes:
 
 Goal: make the MVP pleasant to use, not just technically functional.
 
+Status:
+
+- in progress
+
 Scope:
 
 - show a clearer list of players and voting states
@@ -75,6 +87,17 @@ Scope:
 - refine card selection UI for phone and browser layouts
 - improve empty, reconnect, and error states
 - remove remaining temporary / debug-like UX
+
+Implemented scope:
+
+- responsive table layout with different width limits for player list and card picker
+- player list with current-player and host metadata
+- small card indicators for hidden votes, revealed votes, missed votes, and waiting players
+- large interactive planning cards with selected, disabled, hover, focus, and pressed states
+- table top bar with table name and localized connection state
+- localized participant count with plural resources
+- dark / light theme card colors and app typography
+- feature-local preview fixtures for table UI states
 
 Definition of done:
 

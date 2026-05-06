@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.window.core.layout.WindowSizeClass
 import pl.cube.planning_poker.ui.dimenWide
 
@@ -16,6 +17,11 @@ internal fun isWideWindow() =
 
 @Composable
 internal fun Modifier.fillWidthWide(): Modifier {
-    val width = if (isWideWindow()) Modifier.width(dimenWide) else Modifier.fillMaxWidth()
-    return this.then(width)
+    return fillWidthWide(maxWidth = dimenWide)
+}
+
+@Composable
+internal fun Modifier.fillWidthWide(maxWidth: Dp): Modifier {
+    val widthModifier = if (isWideWindow()) Modifier.width(maxWidth) else Modifier.fillMaxWidth()
+    return this.then(widthModifier)
 }

@@ -27,7 +27,7 @@ object PlanningDecks {
 
 fun PlanningCard.displayLabel(): String = when (this) {
     PlanningCard.Zero -> "0"
-    PlanningCard.Half -> "1/2"
+    PlanningCard.Half -> "½"
     PlanningCard.One -> "1"
     PlanningCard.Two -> "2"
     PlanningCard.Three -> "3"

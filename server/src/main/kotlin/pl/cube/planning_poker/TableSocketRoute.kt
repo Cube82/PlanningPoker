@@ -12,6 +12,7 @@ import pl.cube.planning_poker.models.client.JoinTable
 import pl.cube.planning_poker.models.client.ResetRound
 import pl.cube.planning_poker.models.client.RevealCards
 import pl.cube.planning_poker.models.client.SelectCard
+import pl.cube.planning_poker.models.client.UnselectCard
 import pl.cube.planning_poker.models.ProtocolJson
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -36,6 +37,11 @@ fun Route.tableSocket(game: Game) {
                             is SelectCard -> {
                                 Logger.d("user $playerId voting")
                                 game.submitVote(playerId, message.card)
+                            }
+
+                            UnselectCard -> {
+                                Logger.d("user $playerId removing vote")
+                                game.removeVote(playerId)
                             }
 
                             RevealCards -> {

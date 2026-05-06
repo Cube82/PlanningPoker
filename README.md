@@ -17,6 +17,8 @@ The repository contains:
 - Ktor server
 - Ktor client with WebSockets
 - Koin for dependency injection
+- Compose Multiplatform resources for localized strings, fonts, and drawables
+- Inter font and Material icons
 
 ## Project Structure
 
@@ -34,6 +36,15 @@ Important source sets:
 - `androidMain` - Android-specific actual implementations
 - `wasmJsMain` - web-specific actual implementations
 
+Current UI notes:
+
+- lobby and table screens are implemented in shared Compose code
+- table UI has responsive phone / browser layout constraints
+- table screen includes a top bar with table name and connection state
+- player rows show current player, host role, and vote state
+- planning cards support selected, disabled, hover, focus, and pressed states
+- preview data lives in feature-local preview fixtures instead of shared DTOs
+
 ### `shared`
 
 Shared domain and protocol layer:
@@ -42,6 +53,7 @@ Shared domain and protocol layer:
 - server/client contracts
 - shared table and round models
 - shared deck and known-table definitions
+- public vote states, including hidden votes, revealed votes, missed votes, and not-voted state
 
 ### `server`
 
@@ -303,10 +315,16 @@ Current MVP baseline includes:
 - lobby flow with player name validation
 - table-aware navigation and direct table URLs
 - shared snapshot-based WebSocket protocol
-- join, vote, reveal, and reset round flow
+- join, vote, unselect vote, reveal, and reset round flow
 - host-only reveal and reset by default
+- explicit missed-vote state after reveal
 - visible join and connection failures in UI
-- explicit connection state in table UI
+- explicit connection state in the table top bar
+- improved table UI with responsive layout, player list, interactive cards, dark / light theme colors, Inter font, and Material icons
 - leave-table behavior when the table screen is dismissed
 
-UI and UX polish are still in progress.
+UI and UX polish are still in progress, mainly around empty, reconnect, and recovery states.
+
+## Third-Party Assets
+
+The app bundles Inter and Material icons. See `THIRD_PARTY_NOTICES.md` for license details.

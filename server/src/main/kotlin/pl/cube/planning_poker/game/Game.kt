@@ -136,6 +136,32 @@ class Game {
         }
     }
 
+    fun removeVote(playerId: String) {
+        val currentState = state.value
+        if (currentState.players.none { it.playerId == playerId }) {
+            Logger.d("ignoring vote removal from unknown player")
+            return
+        }
+        if (currentState.round.status != RoundStatus.Voting) {
+            Logger.d("ignoring vote removal outside voting round")
+            return
+        }
+
+        privateVotes.remove(playerId)
+        state.update { current ->
+            current.copy(
+                revision = current.revision + 1,
+                players = current.players.map { player ->
+                    if (player.playerId == playerId) {
+                        player.copy(vote = PublicVoteState.NotVoted)
+                    } else {
+                        player
+                    }
+                }
+            )
+        }
+    }
+
     fun revealCards(playerId: String) {
         val currentState = state.value
         if (!canExecuteRoundAction(playerId, currentState.revealPermission, currentState)) {
@@ -155,7 +181,7 @@ class Game {
                     val vote = privateVotes[player.playerId]
                     player.copy(
                         vote = if (vote == null) {
-                            PublicVoteState.NotVoted
+                            PublicVoteState.MissedVote
                         } else {
                             PublicVoteState.Revealed(vote)
                         }

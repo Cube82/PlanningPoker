@@ -1,10 +1,97 @@
 package pl.cube.planning_poker.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+
+@Immutable
+data class AppCustomColors(
+    val textFieldContainer: Color,
+    val textFieldBorder: Color,
+    val textFieldPlaceholder: Color,
+    val badgeVoted: Color,
+    val onBadgeVoted: Color,
+    val badgeNotVoted: Color,
+    val onBadgeNotVoted: Color,
+    val divider: Color,
+    val cardBackground: Color,
+    val cardContent: Color,
+    val cardBorder: Color,
+    val cardDisabledBackground: Color,
+    val cardDisabledContent: Color,
+    val cardDisabledBorder: Color,
+    val cardSelectedBackground: Color,
+    val cardSelectedContent: Color,
+    val cardSelectedBorder: Color,
+    val cardPressedBackground: Color,
+    val cardPressedContent: Color,
+    val cardPressedBorder: Color,
+    val cardFocusedBackground: Color,
+    val cardFocusedContent: Color,
+    val cardFocusedBorder: Color,
+)
+
+private val lightCustomColors = AppCustomColors(
+    textFieldContainer = textFieldContainerLight,
+    textFieldBorder = textFieldBorderLight,
+    textFieldPlaceholder = textFieldPlaceholderLight,
+    divider = dividerLight,
+    badgeVoted = badgeVotedLight,
+    onBadgeVoted = onBadgeVotedLight,
+    badgeNotVoted = badgeNotVotedLight,
+    onBadgeNotVoted = onBadgeNotVotedLight,
+    cardBackground = Color(0xFFFFFFFF),
+    cardContent = Color(0xFF104A73),
+    cardBorder = Color(0xFFC6CBCF),
+    cardDisabledBackground = Color(0x61FFFFFF),
+    cardDisabledContent = Color(0x611A1B21),
+    cardDisabledBorder = Color(0x61C5C6D0),
+    cardSelectedBackground = Color(0xFFD9E2FF),
+    cardSelectedContent = Color(0xFF2F4578),
+    cardSelectedBorder = Color(0xFF475D92),
+    cardPressedBackground = Color(0xFFDAE2FF),
+    cardPressedContent = Color(0xFF304578),
+    cardPressedBorder = Color(0xFF485D92),
+    cardFocusedBackground = Color(0xFFFFFFFF),
+    cardFocusedContent = Color(0xFF104A73),
+    cardFocusedBorder = Color(0xFF475D92),
+)
+
+private val darkCustomColors = AppCustomColors(
+    textFieldContainer = textFieldContainerDark,
+    textFieldBorder = textFieldBorderDark,
+    textFieldPlaceholder = textFieldPlaceholderDark,
+    divider = dividerDark,
+    badgeVoted = badgeVotedDark,
+    onBadgeVoted = onBadgeVotedDark,
+    badgeNotVoted = badgeNotVotedDark,
+    onBadgeNotVoted = onBadgeNotVotedDark,
+    cardBackground = Color(0xFF25333E),
+    cardContent = Color(0xFFCEE5FF),
+    cardBorder = Color(0xFF25333E),
+    cardDisabledBackground = Color(0x6144464F),
+    cardDisabledContent = Color(0x61E2E2E9),
+    cardDisabledBorder = Color(0x6144464F),
+    cardSelectedBackground = Color(0xFF2F4578),
+    cardSelectedContent = Color(0xFFD9E2FF),
+    cardSelectedBorder = Color(0xFF1D3A6E),
+    cardPressedBackground = Color(0xFF304578),
+    cardPressedContent = Color(0xFFDAE2FF),
+    cardPressedBorder = Color(0xFFB1C5FF),
+    cardFocusedBackground = Color(0xFF25333E),
+    cardFocusedContent = Color(0xFFCEE5FF),
+    cardFocusedBorder = Color(0xFF1D3A6E),
+)
+
+private val LocalAppCustomColors = staticCompositionLocalOf<AppCustomColors> {
+    error("No AppCustomColors provided")
+}
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -91,10 +178,22 @@ fun AppTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
+    val customColors = when {
+        darkTheme -> darkCustomColors
+        else -> lightCustomColors
+    }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
+    CompositionLocalProvider(LocalAppCustomColors provides customColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = appTypography(),
+            content = content
+        )
+    }
+}
+
+object AppThemeExtras {
+    val colors: AppCustomColors
+        @Composable get() = LocalAppCustomColors.current
 }
 

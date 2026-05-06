@@ -14,6 +14,10 @@ sealed interface PublicVoteState {
     data object VotedHidden : PublicVoteState
 
     @Serializable
+    @SerialName("missedVote")
+    data object MissedVote : PublicVoteState
+
+    @Serializable
     @SerialName("revealed")
     data class Revealed(
         val card: PlanningCard,

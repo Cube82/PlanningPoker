@@ -7,10 +7,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pl.cube.planning_poker.helpers.noop
+import pl.cube.planning_poker.ui.components.AppSpacer
+import pl.cube.planning_poker.ui.components.AppText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun SimpleAlertDialog(
+internal fun AppAlertDialog(
     message: String,
     title: String? = null,
     button: String = "ok",
@@ -25,22 +27,22 @@ internal fun SimpleAlertDialog(
         ) {
             Column(modifier = Modifier.padding(dimen16).defaultMinSize(minWidth = 240.dp)) {
                 if (title != null) {
-                    Text(
+                    AppText(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
                     )
-                    Spacer(modifier = Modifier.height(dimen4))
+                    AppSpacer(dimen4)
                 }
-                Text(
+                AppText(
                     text = message,
                     style = MaterialTheme.typography.bodyLarge,
                 )
-                Spacer(modifier = Modifier.height(dimen16))
+                AppSpacer(dimen16)
                 TextButton(
                     onClick = { onConfirm.invoke() },
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(button)
+                    AppText(button)
                 }
             }
         }

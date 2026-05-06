@@ -14,6 +14,7 @@ import pl.cube.planning_poker.models.client.JoinTable
 import pl.cube.planning_poker.models.client.ResetRound
 import pl.cube.planning_poker.models.client.RevealCards
 import pl.cube.planning_poker.models.client.SelectCard
+import pl.cube.planning_poker.models.client.UnselectCard
 import pl.cube.planning_poker.models.server.PlanningCard
 import pl.cube.planning_poker.models.server.ServerError
 import pl.cube.planning_poker.models.server.TableState
@@ -66,7 +67,10 @@ internal class TableViewModel(
     private val tableId = thisRoute.tableId
 
     init {
-        _uiState.value = _uiState.value.copy(tmp = playerName)
+        _uiState.value = _uiState.value.copy(
+            playerName = playerName,
+            tableName = tableId,
+        )
 
         if (playerName.isBlank()) {
             goToLobby()
@@ -108,6 +112,12 @@ internal class TableViewModel(
     fun selectCard(card: PlanningCard) {
         runClientAction("selecting card $card") {
             client.sendMessage(SelectCard(card))
+        }
+    }
+
+    fun unselectCard() {
+        runClientAction("unselecting card") {
+            client.sendMessage(UnselectCard)
         }
     }
 

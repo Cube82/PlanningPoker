@@ -19,14 +19,16 @@ The project already has a working multiplayer MVP baseline:
 - WebSocket communication between client and server
 - shared snapshot-based table state broadcast
 - shared typed contracts for client actions and server errors
-- table / round model with host, hidden votes, reveal, and reset
-- explicit connection state in table UI
+- table / round model with host, hidden votes, card unselect, missed votes after reveal, reveal, and reset
+- explicit connection state in table UI and table top bar
 - visible join failures instead of silent no-op behavior
 - leave-table behavior when the table screen is dismissed
+- polished table UI with responsive phone / browser layout, card controls, player list, dark / light theme colors, Inter font, and Material icons
+- preview fixtures for table UI states kept outside shared DTOs
 
 Main gaps compared to the full Planning Poker product:
 
-- UI / UX still needs polish and clearer guidance
+- some UI / UX flows still need final polish and clearer empty / recovery states
 - server still behaves like one real in-memory table with a validated known-table list, not full dynamic multi-table management
 - reconnect and recovery behavior are still lightly tested and mostly verified manually
 - server logic and protocol flow still have no automated tests
@@ -40,11 +42,14 @@ Main gaps compared to the full Planning Poker product:
 - dependency injection uses Koin
 - current screen flow is `LobbyScreen` -> `TableScreen`
 - lobby is responsible for collecting missing `playerName` and `tableId` before entering `TableScreen`
+- table UI uses reusable card, player-list, button, text, and preview fixture helpers
+- wide-screen layout uses constrained content widths while phone layout fills available width with padding
 
 ### `shared`
 
 - contains serializable models using `kotlinx.serialization`
 - this is the right place for WebSocket contracts, domain types, deck definitions, and shared protocol-level logic
+- vote state is protocol-level state; add new public vote states here first when server and UI both need to distinguish them
 
 ### `server`
 
@@ -85,7 +90,9 @@ The first usable version of the app should allow:
 - joining a room with a player name
 - multiple participants joining the same table
 - each player selecting one estimation card
+- each player unselecting an already selected estimation card
 - cards staying hidden until reveal
+- players who did not vote being represented explicitly after reveal
 - reveal triggered by the host
 - round reset and next-round start
 
@@ -105,13 +112,19 @@ Note:
 
 ## Direction After MVP
 
-- UI / UX polish and responsiveness improvements
+- final UI / UX polish, especially empty, reconnect, and recovery states
 - multiple tables and join-by-room-code flow
 - host / Scrum Master role expansion
 - round history and helper statistics
 - reconnect after connection loss
 - local or remote session persistence
 - automated tests for protocol and game logic
+
+## Third-Party Assets
+
+- Inter is bundled as the app font and is covered by the SIL Open Font License 1.1.
+- Material icons are bundled as drawable resources and are covered by Apache License 2.0.
+- Keep third-party asset notes in `THIRD_PARTY_NOTICES.md`.
 
 ## How To Make Decisions
 
