@@ -10,6 +10,7 @@ import pl.cube.planning_poker.navi.ComposeNavigator
 import pl.cube.planning_poker.navi.Destination
 import pl.cube.planning_poker.navi.Navigator
 import pl.cube.planning_poker.net.httpClient
+import pl.cube.planning_poker.preferences.AppSettingsRepository
 
 val appModule = module {
     single<Navigator> {
@@ -17,6 +18,7 @@ val appModule = module {
     }
 
     single<PlayerNameValidator> { PlayerNameValidator() }
+    single<AppSettingsRepository> { AppSettingsRepository() }
     single<GameClientImpl> { GameClientImpl(httpClient()) }
 
     viewModelOf(::LobbyViewModel)

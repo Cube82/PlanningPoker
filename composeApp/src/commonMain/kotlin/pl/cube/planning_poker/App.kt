@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,17 +24,35 @@ import pl.cube.planning_poker.navi.Destination
 import pl.cube.planning_poker.navi.NavigationAction
 import pl.cube.planning_poker.navi.Navigator
 import pl.cube.planning_poker.navi.ObserveAsEvents
+import pl.cube.planning_poker.preferences.AppSettingsRepository
 import pl.cube.planning_poker.ui.dimen16
+import pl.cube.planning_poker.ui.settings.AppLanguage
+import pl.cube.planning_poker.ui.settings.AppSettingsState
+import pl.cube.planning_poker.ui.settings.AppThemeMode
 import pl.cube.planning_poker.ui.theme.AppTheme
+
+private var isKoinStarted = false
 
 @Composable
 fun App(
     onNavHostReady: suspend (androidx.navigation.NavHostController) -> Unit = {},
 ) {
     initKoin()
+    val settingsRepository = koinInject<AppSettingsRepository>()
     val navController = rememberNavController()
+    var themeMode by remember { mutableStateOf(settingsRepository.getThemeMode()) }
+    var language by remember { mutableStateOf(AppLanguage.System) }
+    val settingsState = AppSettingsState(
+        themeMode = themeMode,
+        language = language,
+    )
+    val useDarkTheme = when (themeMode) {
+        AppThemeMode.System -> isSystemInDarkTheme()
+        AppThemeMode.Light -> false
+        AppThemeMode.Dark -> true
+    }
 
-    AppTheme {
+    AppTheme(darkTheme = useDarkTheme) {
         val navigator = koinInject<Navigator>()
 
         LaunchedEffect(navController) {
@@ -64,10 +82,22 @@ fun App(
                     startDestination = navigator.startDestination,
                 ) {
                     composable<Destination.Lobby> {
-                        LobbyScreen()
+                        LobbyScreen(
+                            settingsState = settingsState,
+                            onThemeModeChange = { newThemeMode ->
+                                themeMode = newThemeMode
+                                settingsRepository.setThemeMode(newThemeMode)
+                            },
+                        )
                     }
                     composable<Destination.Table> {
-                        TableScreen()
+                        TableScreen(
+                            settingsState = settingsState,
+                            onThemeModeChange = { newThemeMode ->
+                                themeMode = newThemeMode
+                                settingsRepository.setThemeMode(newThemeMode)
+                            },
+                        )
                     }
                 }
             }
@@ -75,7 +105,14 @@ fun App(
     }
 }
 
-private fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
-    appDeclaration()
-    modules(appModule)
+private fun initKoin(appDeclaration: KoinAppDeclaration = {}) {
+    if (isKoinStarted) {
+        return
+    }
+
+    startKoin {
+        appDeclaration()
+        modules(appModule)
+    }
+    isKoinStarted = true
 }

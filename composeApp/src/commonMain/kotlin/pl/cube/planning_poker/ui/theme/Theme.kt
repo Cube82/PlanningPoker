@@ -1,11 +1,11 @@
 package pl.cube.planning_poker.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -35,6 +35,7 @@ data class AppCustomColors(
     val cardFocusedBackground: Color,
     val cardFocusedContent: Color,
     val cardFocusedBorder: Color,
+    val logo: Color,
 )
 
 private val lightCustomColors = AppCustomColors(
@@ -61,6 +62,7 @@ private val lightCustomColors = AppCustomColors(
     cardFocusedBackground = Color(0xFFFFFFFF),
     cardFocusedContent = Color(0xFF104A73),
     cardFocusedBorder = Color(0xFF475D92),
+    logo = Color(0xFF1D3A6E),
 )
 
 private val darkCustomColors = AppCustomColors(
@@ -87,11 +89,14 @@ private val darkCustomColors = AppCustomColors(
     cardFocusedBackground = Color(0xFF25333E),
     cardFocusedContent = Color(0xFFCEE5FF),
     cardFocusedBorder = Color(0xFF1D3A6E),
+    logo = Color(0xFFF6F7F9),
 )
 
 private val LocalAppCustomColors = staticCompositionLocalOf<AppCustomColors> {
     error("No AppCustomColors provided")
 }
+
+val LocalIsDarkTheme = staticCompositionLocalOf { false }
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -183,7 +188,10 @@ fun AppTheme(
         else -> lightCustomColors
     }
 
-    CompositionLocalProvider(LocalAppCustomColors provides customColors) {
+    CompositionLocalProvider(
+        LocalAppCustomColors provides customColors,
+        LocalIsDarkTheme provides darkTheme
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = appTypography(),

@@ -8,7 +8,7 @@
     <string name="lobby_selected_table">Table: %1$s</string>
     <string name="lobby_table_label">Choose table</string>
     <string name="lobby_table_option">Table: %1$s</string>
-    <string name="lobby_title">PlanningPoker</string>
+    <string name="lobby_title">Lobby</string>
     <string name="lobby_welcome">Welcome</string>
 
     <string name="table_alert_connection_problem">Could not connect to server</string>
@@ -38,4 +38,10 @@
     <string name="connection_state_error">error</string>
     <string name="connection_state_idle">idle</string>
     <string name="connection_state_joined">joined</string>
+
+    <string name="settings_menu_content_description">Open settings</string>
+    <string name="settings_theme_section">Theme</string>
+    <string name="settings_theme_system">system</string>
+    <string name="settings_theme_light">light</string>
+    <string name="settings_theme_dark">dark</string>
 </resources>

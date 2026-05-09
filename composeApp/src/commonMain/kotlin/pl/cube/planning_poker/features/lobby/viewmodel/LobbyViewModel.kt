@@ -17,9 +17,11 @@ import pl.cube.planning_poker.helpers.ValidateStatus
 import pl.cube.planning_poker.models.server.KnownTables
 import pl.cube.planning_poker.navi.Destination
 import pl.cube.planning_poker.navi.Navigator
+import pl.cube.planning_poker.preferences.AppSettingsRepository
 
 internal class LobbyViewModel(
     private val playerNameValidator: PlayerNameValidator,
+    private val settingsRepository: AppSettingsRepository,
     navigator: Navigator,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), Navigator by navigator {
@@ -27,8 +29,9 @@ internal class LobbyViewModel(
     private val _uiState = MutableStateFlow(LobbyUiState())
     val uiState: StateFlow<LobbyUiState> = _uiState.asStateFlow()
     private val thisRoute = savedStateHandle.toRoute<Destination.Lobby>()
+    private val routePlayerName = thisRoute.player
 
-    var playerName by mutableStateOf(thisRoute.player.orEmpty())
+    var playerName by mutableStateOf(routePlayerName.orEmpty())
         private set
 
     init {
@@ -41,10 +44,13 @@ internal class LobbyViewModel(
         }
         _uiState.value = LobbyUiState(
             playerNameError = initialPlayerNameError,
+            lastPlayerName = settingsRepository.getLastPlayerName(),
             selectedTableId = initialTableId,
             availableTables = DEFAULT_TABLES,
         )
-        navigateIfReady()
+        if (routePlayerName != null) {
+            navigateIfReady()
+        }
     }
 
     fun updatePlayerName(input: String) {
@@ -79,6 +85,7 @@ internal class LobbyViewModel(
             return
         }
 
+        settingsRepository.setLastPlayerName(trimmedPlayerName)
         viewModelScope.launch {
             navigate(
                 destination = Destination.Table(
