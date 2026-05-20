@@ -1,12 +1,7 @@
 package pl.cube.planning_poker
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
@@ -25,7 +20,6 @@ import pl.cube.planning_poker.navi.NavigationAction
 import pl.cube.planning_poker.navi.Navigator
 import pl.cube.planning_poker.navi.ObserveAsEvents
 import pl.cube.planning_poker.preferences.AppSettingsRepository
-import pl.cube.planning_poker.ui.dimen16
 import pl.cube.planning_poker.ui.settings.AppLanguage
 import pl.cube.planning_poker.ui.settings.AppSettingsState
 import pl.cube.planning_poker.ui.settings.AppThemeMode
@@ -52,7 +46,14 @@ fun App(
         AppThemeMode.Dark -> true
     }
 
-    AppTheme(darkTheme = useDarkTheme) {
+    AppTheme(
+        darkTheme = useDarkTheme,
+        settingsState = settingsState,
+        onThemeModeChange = { newThemeMode ->
+            themeMode = newThemeMode
+            settingsRepository.setThemeMode(newThemeMode)
+        }
+    ) {
         val navigator = koinInject<Navigator>()
 
         LaunchedEffect(navController) {
@@ -73,8 +74,7 @@ fun App(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .windowInsetsPadding(WindowInsets.safeDrawing)
-                    .padding(dimen16),
+                    .windowInsetsPadding(WindowInsets.safeDrawing),
 
                 ) {
                 NavHost(
@@ -82,22 +82,10 @@ fun App(
                     startDestination = navigator.startDestination,
                 ) {
                     composable<Destination.Lobby> {
-                        LobbyScreen(
-                            settingsState = settingsState,
-                            onThemeModeChange = { newThemeMode ->
-                                themeMode = newThemeMode
-                                settingsRepository.setThemeMode(newThemeMode)
-                            },
-                        )
+                        LobbyScreen()
                     }
                     composable<Destination.Table> {
-                        TableScreen(
-                            settingsState = settingsState,
-                            onThemeModeChange = { newThemeMode ->
-                                themeMode = newThemeMode
-                                settingsRepository.setThemeMode(newThemeMode)
-                            },
-                        )
+                        TableScreen()
                     }
                 }
             }

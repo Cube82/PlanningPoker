@@ -3,7 +3,6 @@ package pl.cube.planning_poker.features.table.view
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -19,15 +18,14 @@ import pl.cube.planning_poker.helpers.PlayerNameValidationError
 import pl.cube.planning_poker.helpers.fillWidthWide
 import pl.cube.planning_poker.models.server.*
 import pl.cube.planning_poker.ui.*
-import pl.cube.planning_poker.ui.components.*
-import pl.cube.planning_poker.ui.settings.AppSettingsState
-import pl.cube.planning_poker.ui.settings.AppThemeMode
+import pl.cube.planning_poker.ui.components.AppButton
+import pl.cube.planning_poker.ui.components.AppHeadline
+import pl.cube.planning_poker.ui.components.AppScaffold
+import pl.cube.planning_poker.ui.components.AppSpacer
 import planningpoker.composeapp.generated.resources.*
 
 @Composable
 internal fun TableScreen(
-    settingsState: AppSettingsState,
-    onThemeModeChange: (AppThemeMode) -> Unit,
     viewModel: TableViewModel = koinViewModel(),
 ) {
     DisposableEffect(viewModel) {
@@ -41,12 +39,10 @@ internal fun TableScreen(
     TableScreenLayout(
         state = state,
         tableState = tableState,
-        settingsState = settingsState,
         selectCard = viewModel::selectCard,
         unselectCard = viewModel::unselectCard,
         revealCards = viewModel::revealCards,
         resetRound = viewModel::resetRound,
-        onThemeModeChange = onThemeModeChange,
     )
 }
 
@@ -54,12 +50,10 @@ internal fun TableScreen(
 private fun TableScreenLayout(
     state: TableUiState,
     tableState: TableState,
-    settingsState: AppSettingsState,
     selectCard: (PlanningCard) -> Unit,
     unselectCard: () -> Unit,
     revealCards: () -> Unit,
     resetRound: () -> Unit,
-    onThemeModeChange: (AppThemeMode) -> Unit,
 ) {
     if (state.alert != null) {
         val alertText = state.alert.toText()
@@ -71,16 +65,8 @@ private fun TableScreenLayout(
         )
     }
 
-    Scaffold(
-        topBar = {
-            TableTopBar(
-                tableName = state.tableName,
-                connectionState = state.connectionState,
-                settingsState = settingsState,
-                onThemeModeChange = onThemeModeChange,
-            )
-        },
-        contentWindowInsets = WindowInsets(0),
+    AppScaffold(
+        subtitle = getSubtitle(state),
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -131,48 +117,22 @@ private fun TableScreenLayout(
                         onUnselect = unselectCard,
                     )
                 }
+                AppSpacer(dimen16)
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TableTopBar(
-    tableName: String,
-    connectionState: ConnectionState,
-    settingsState: AppSettingsState,
-    onThemeModeChange: (AppThemeMode) -> Unit,
-) {
-    val connectionStateText = stringResource(connectionState.labelRes)
-
-    TopAppBar(
-        title = {
-            Column {
-                AppLogo()
-                AppSpacer(dimen4)
-                AppText(
-                    text = if (tableName.isBlank()) {
-                        stringResource(Res.string.table_title)
-                    } else {
-                        "${stringResource(Res.string.table_title)} - $tableName ($connectionStateText)"
-                    },
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        },
-        actions = {
-            AppSettingsMenu(
-                state = settingsState,
-                onThemeModeChange = onThemeModeChange,
-            )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-        ),
-    )
+private fun getSubtitle(
+    state: TableUiState,
+): String {
+    val connectionStateText = stringResource(state.connectionState.labelRes)
+    return if (state.tableName.isBlank()) {
+        stringResource(Res.string.table_title)
+    } else {
+        "${stringResource(Res.string.table_title)} - ${state.tableName} ($connectionStateText)"
+    }
 }
 
 @Composable
@@ -199,7 +159,7 @@ private fun RoundActions(
                 text = Res.string.table_reveal_button,
                 onClick = onReveal,
                 modifier = Modifier.padding(dimen4),
-                enabled = enabled && tableState.round.status == RoundStatus.Voting,
+                enabled = enabled && (tableState.round.status == RoundStatus.Voting),
                 icon = Res.drawable.visibility_24px,
             )
         }
@@ -305,12 +265,10 @@ private fun TableScreenPreviewContent(tableState: TableState) {
         TableScreenLayout(
             state = TablePreviewFixtures.uiState,
             tableState = tableState,
-            settingsState = AppSettingsState(),
             selectCard = {},
             unselectCard = {},
             revealCards = {},
             resetRound = {},
-            onThemeModeChange = {},
         )
     }
 }

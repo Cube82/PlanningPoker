@@ -1,9 +1,11 @@
 package pl.cube.planning_poker.features.lobby.view
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,26 +13,18 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.cube.planning_poker.features.lobby.viewmodel.LobbyViewModel
 import pl.cube.planning_poker.helpers.PlayerNameValidationError
 import pl.cube.planning_poker.helpers.fillWidthWide
-import pl.cube.planning_poker.ui.DefaultPreview
-import pl.cube.planning_poker.ui.settings.AppSettingsState
-import pl.cube.planning_poker.ui.settings.AppThemeMode
+import pl.cube.planning_poker.ui.*
 import pl.cube.planning_poker.ui.components.*
-import pl.cube.planning_poker.ui.dimen16
-import pl.cube.planning_poker.ui.dimen32
-import pl.cube.planning_poker.ui.dimen8
 import planningpoker.composeapp.generated.resources.*
 
 @Composable
 internal fun LobbyScreen(
-    settingsState: AppSettingsState,
-    onThemeModeChange: (AppThemeMode) -> Unit,
     viewModel: LobbyViewModel = koinViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -40,11 +34,9 @@ internal fun LobbyScreen(
         playerNameError = state.playerNameError,
         selectedTableId = state.selectedTableId,
         availableTables = state.availableTables,
-        settingsState = settingsState,
         updatePlayerName = viewModel::updatePlayerName,
         selectTable = viewModel::selectTable,
         onJoinTableClick = viewModel::joinTable,
-        onThemeModeChange = onThemeModeChange,
     )
 }
 
@@ -55,11 +47,9 @@ internal fun LobbyLayout(
     playerNameError: PlayerNameValidationError?,
     selectedTableId: String?,
     availableTables: List<String>,
-    settingsState: AppSettingsState,
     updatePlayerName: (String) -> Unit,
     selectTable: (String) -> Unit,
     onJoinTableClick: () -> Unit,
-    onThemeModeChange: (AppThemeMode) -> Unit,
 ) {
     val needsPlayerName = playerName.isBlank() || playerNameError != null
     val needsTable = selectedTableId.isNullOrBlank()
@@ -72,22 +62,16 @@ internal fun LobbyLayout(
         onJoinTableClick()
     }
 
-    Scaffold(
-        topBar = {
-            LobbyTopBar(
-                settingsState = settingsState,
-                onThemeModeChange = onThemeModeChange,
-            )
-        },
-        contentWindowInsets = WindowInsets(0),
+    AppScaffold(
+        subtitle = stringResource(Res.string.lobby_title),
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AppLogoBig()
             AppSpacer(dimen16)
             AppCard {
                 Column(
@@ -105,32 +89,28 @@ internal fun LobbyLayout(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    if (needsPlayerName) {
-                        AppSpacer(dimen16)
-                        AppTextField(
-                            value = playerNameInput,
-                            onValueChange = { playerNameInput = it },
-                            placeholder = stringResource(Res.string.lobby_player_name_label),
-                            modifier = Modifier.fillMaxWidth().onKeyEvent { event ->
-                                if (event.key.keyCode == Key.Enter.keyCode) {
-                                    submitPlayerName()
-                                    true
-                                } else {
-                                    false
-                                }
-                            },
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(onDone = { submitPlayerName() }),
-                            isError = playerNameError != null,
-                            supportingText = {
-                                playerNameError?.let { error ->
-                                    AppText(error.toMessage())
-                                }
-                            },
-                        )
-                    } else {
-                        AppText(stringResource(Res.string.lobby_selected_player, playerName))
-                    }
+                    AppSpacer(dimen16)
+                    AppTextField(
+                        value = playerNameInput,
+                        onValueChange = { playerNameInput = it },
+                        placeholder = stringResource(Res.string.lobby_player_name_label),
+                        modifier = Modifier.fillMaxWidth().onKeyEvent { event ->
+                            if (event.key.keyCode == Key.Enter.keyCode) {
+                                submitPlayerName()
+                                true
+                            } else {
+                                false
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { submitPlayerName() }),
+                        isError = playerNameError != null,
+                        supportingText = {
+                            playerNameError?.let { error ->
+                                AppText(error.toMessage())
+                            }
+                        },
+                    )
 
                     AppSpacer(dimen16)
 
@@ -157,7 +137,7 @@ internal fun LobbyLayout(
 
                     AppSpacer(dimen16)
 
-                    if (needsPlayerName) {
+                    if (needsPlayerName || !needsTable) {
                         AppDivider()
                         AppSpacer(dimen16)
                         AppButton(
@@ -168,32 +148,11 @@ internal fun LobbyLayout(
                     }
                 }
             }
+            Spacer(Modifier.weight(1f))
+            AppSpacer(dimen32)
+            AppLogoBig()
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun LobbyTopBar(
-    settingsState: AppSettingsState,
-    onThemeModeChange: (AppThemeMode) -> Unit,
-) {
-    TopAppBar(
-        title = {
-            AppLogo()
-        },
-        actions = {
-            AppSettingsMenu(
-                state = settingsState,
-                onThemeModeChange = onThemeModeChange,
-            )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
-        ),
-    )
 }
 
 @Composable
@@ -201,7 +160,7 @@ private fun PlayerNameValidationError.toMessage(): String = when (this) {
     PlayerNameValidationError.InvalidLength -> stringResource(Res.string.lobby_player_name_error_invalid_length)
 }
 
-@PreviewLightDark
+@MultiPreview
 @Composable
 private fun LobbyScreenPreview() {
     DefaultPreview {
@@ -211,11 +170,9 @@ private fun LobbyScreenPreview() {
             playerNameError = null,
             selectedTableId = null,
             availableTables = listOf("main"),
-            settingsState = AppSettingsState(),
             updatePlayerName = {},
             selectTable = {},
             onJoinTableClick = {},
-            onThemeModeChange = {},
         )
     }
 }

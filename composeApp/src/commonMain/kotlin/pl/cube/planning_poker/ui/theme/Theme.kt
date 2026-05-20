@@ -9,6 +9,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import pl.cube.planning_poker.ui.settings.AppSettingsState
+import pl.cube.planning_poker.ui.settings.AppThemeMode
 
 @Immutable
 data class AppCustomColors(
@@ -98,6 +100,12 @@ private val LocalAppCustomColors = staticCompositionLocalOf<AppCustomColors> {
 
 val LocalIsDarkTheme = staticCompositionLocalOf { false }
 
+val LocalAppSettings = staticCompositionLocalOf { AppSettingsState() }
+
+val LocalOnThemeModeChange = staticCompositionLocalOf<(AppThemeMode) -> Unit> {
+    { _ -> }
+}
+
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
@@ -177,6 +185,8 @@ private val darkScheme = darkColorScheme(
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    settingsState: AppSettingsState = AppSettingsState(),
+    onThemeModeChange: (AppThemeMode) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
@@ -190,7 +200,9 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalAppCustomColors provides customColors,
-        LocalIsDarkTheme provides darkTheme
+        LocalIsDarkTheme provides darkTheme,
+        LocalAppSettings provides settingsState,
+        LocalOnThemeModeChange provides onThemeModeChange
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

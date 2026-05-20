@@ -9,6 +9,22 @@ The repository contains:
 - `shared` - shared models and serialization contracts
 - `server` - Ktor backend with WebSocket support
 
+## Screenshots
+
+### Web
+
+<p>
+  <img src="docs/screenshots/lobby-web.png" alt="Lobby screen on web" width="420">
+  <img src="docs/screenshots/table-web.png" alt="Table screen on web" width="420">
+</p>
+
+### Android
+
+<p>
+  <img src="docs/screenshots/lobby-phone.png" alt="Lobby screen on Android" width="220">
+  <img src="docs/screenshots/table-phone.png" alt="Table screen on Android" width="220">
+</p>
+
 ## Tech Stack
 
 - Kotlin Multiplatform

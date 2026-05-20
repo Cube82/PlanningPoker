@@ -4,11 +4,10 @@
     <string name="lobby_player_before_info">Wprowadź swoją nazwę gracza i wybierz stół aby przejść dalej</string>
     <string name="lobby_player_name_error_invalid_length">Nazwa gracza musi mieć od 3 do 20 znaków</string>
     <string name="lobby_player_name_label">Nazwa gracza</string>
-    <string name="lobby_selected_player">Gracz: %1$s</string>
     <string name="lobby_selected_table">Stół: %1$s</string>
     <string name="lobby_table_label">Wybierz stół</string>
     <string name="lobby_table_option">Stół: %1$s</string>
-    <string name="lobby_title">Lobby</string>
+    <string name="lobby_title">lobby</string>
     <string name="lobby_welcome">Witaj</string>
 
     <string name="table_alert_connection_problem">Nie udało się połączyć z serwerem</string>
@@ -33,7 +32,7 @@
     <string name="table_reset_button">Reset rundy</string>
     <string name="table_reveal_button">Odkryj</string>
     <string name="table_round_label">Runda %1$d</string>
-    <string name="table_title">Stół</string>
+    <string name="table_title">stół</string>
 
     <string name="connection_state_connecting">łączenie</string>
     <string name="connection_state_disconnected">rozłączono</string>

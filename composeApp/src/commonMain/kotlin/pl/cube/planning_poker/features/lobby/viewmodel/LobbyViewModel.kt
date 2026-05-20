@@ -94,8 +94,9 @@ internal class LobbyViewModel(
                 ),
                 options = {
                     popUpTo(thisRoute) {
-                        inclusive = true
+                        inclusive = false
                     }
+                    launchSingleTop = true
                 },
             )
         }

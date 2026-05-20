@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -31,7 +32,10 @@ fun AppLogoBig() {
     val isDark = LocalIsDarkTheme.current
     val logoResource = if (isDark) Res.drawable.app_logo_dark else Res.drawable.app_logo_light
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.alpha(0.25f),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Image(
             painter = painterResource(logoResource),
             contentDescription = null,
@@ -46,14 +50,18 @@ fun AppLogoBig() {
 
 @Composable
 private fun LogoTexts() {
+    val fontSize = 24.sp
+    val lineHeight = 30.sp
+    val letterSpacing = (-0.2).sp
+
     AppText(
         text = "planning",
         style = TextStyle(
             color = AppThemeExtras.colors.logo,
             fontWeight = FontWeight.Light,
-            fontSize = 24.sp,
-            lineHeight = 30.sp,
-            letterSpacing = (-0.2).sp,
+            fontSize = fontSize,
+            lineHeight = lineHeight,
+            letterSpacing = letterSpacing,
         ),
     )
     AppText(
@@ -61,9 +69,9 @@ private fun LogoTexts() {
         style = TextStyle(
             color = AppThemeExtras.colors.logo,
             fontWeight = FontWeight.Bold,
-            fontSize = 24.sp,
-            lineHeight = 30.sp,
-            letterSpacing = (-0.2).sp,
+            fontSize = fontSize,
+            lineHeight = lineHeight,
+            letterSpacing = letterSpacing,
         )
     )
 }

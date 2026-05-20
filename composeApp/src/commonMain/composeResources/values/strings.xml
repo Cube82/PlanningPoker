@@ -4,11 +4,10 @@
     <string name="lobby_player_before_info">Enter your name and choose table to get started</string>
     <string name="lobby_player_name_error_invalid_length">Player name must be between 3 and 20 characters</string>
     <string name="lobby_player_name_label">Player name</string>
-    <string name="lobby_selected_player">Player: %1$s</string>
     <string name="lobby_selected_table">Table: %1$s</string>
     <string name="lobby_table_label">Choose table</string>
     <string name="lobby_table_option">Table: %1$s</string>
-    <string name="lobby_title">Lobby</string>
+    <string name="lobby_title">lobby</string>
     <string name="lobby_welcome">Welcome</string>
 
     <string name="table_alert_connection_problem">Could not connect to server</string>
@@ -31,7 +30,7 @@
     <string name="table_reset_button">Reset round</string>
     <string name="table_reveal_button">Reveal</string>
     <string name="table_round_label">Round %1$d</string>
-    <string name="table_title">Table</string>
+    <string name="table_title">table</string>
 
     <string name="connection_state_connecting">connecting</string>
     <string name="connection_state_disconnected">disconnected</string>
