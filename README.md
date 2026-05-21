@@ -299,7 +299,7 @@ The Docker image:
 
 - builds the Compose Wasm production distribution
 - builds the Ktor server distribution
-- installs the Android SDK command line tools needed by the configured Android target during Gradle configuration
+- installs the minimal Android SDK platform needed because `composeApp` also declares an Android target during Gradle configuration
 - copies the web assets into `/app/public`
 - starts the Ktor server as the public web process
 

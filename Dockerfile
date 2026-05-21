@@ -20,8 +20,9 @@ RUN mkdir -p "${ANDROID_HOME}/cmdline-tools" \
     && mv "${ANDROID_HOME}/cmdline-tools/cmdline-tools" "${ANDROID_HOME}/cmdline-tools/latest" \
     && rm /tmp/cmdline-tools.zip
 
-RUN yes | sdkmanager --licenses >/dev/null
-RUN sdkmanager "platform-tools" "platforms;android-37" "build-tools;37.0.0"
+RUN yes | sdkmanager --sdk_root="${ANDROID_HOME}" --licenses >/dev/null
+RUN sdkmanager --sdk_root="${ANDROID_HOME}" "platform-tools"
+RUN sdkmanager --sdk_root="${ANDROID_HOME}" "platforms;android-37"
 
 COPY . .
 
