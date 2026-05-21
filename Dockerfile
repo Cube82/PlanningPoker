@@ -2,6 +2,7 @@ FROM eclipse-temurin:21-jdk AS build
 
 ARG ANDROID_CMDLINE_TOOLS_VERSION=14742923
 ARG ANDROID_CMDLINE_TOOLS_SHA1=48833c34b761c10cb20bcd16582129395d121b27
+ARG ANDROID_COMPILE_SDK=36
 
 ENV ANDROID_HOME=/opt/android-sdk
 ENV ANDROID_SDK_ROOT=/opt/android-sdk
@@ -21,13 +22,12 @@ RUN mkdir -p "${ANDROID_HOME}/cmdline-tools" \
     && rm /tmp/cmdline-tools.zip
 
 RUN yes | sdkmanager --sdk_root="${ANDROID_HOME}" --licenses >/dev/null
-RUN sdkmanager --sdk_root="${ANDROID_HOME}" "platform-tools"
-RUN sdkmanager --sdk_root="${ANDROID_HOME}" "platforms;android-37"
+RUN sdkmanager --sdk_root="${ANDROID_HOME}" "platform-tools" "platforms;android-${ANDROID_COMPILE_SDK}"
 
 COPY . .
 
 RUN chmod +x ./gradlew
-RUN ./gradlew :composeApp:wasmJsBrowserDistribution :server:installDist --no-daemon
+RUN ./gradlew :composeApp:wasmJsBrowserDistribution :server:installDist -PandroidCompileSdk=${ANDROID_COMPILE_SDK} --no-daemon
 
 FROM eclipse-temurin:21-jre
 

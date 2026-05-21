@@ -1,7 +1,11 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+
+val androidCompileSdk = providers.gradleProperty("androidCompileSdk")
+    .map(String::toInt)
+    .getOrElse(libs.versions.android.compileSdk.get().toInt())
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -18,7 +22,7 @@ kotlin {
 
     android {
         namespace = "pl.cube.planning_poker.composeapp"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        compileSdk = androidCompileSdk
         minSdk = libs.versions.android.minSdk.get().toInt()
 
         androidResources {
@@ -52,7 +56,7 @@ kotlin {
     }
     
     sourceSets {
-        
+
         androidMain.dependencies {
             implementation(libs.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
@@ -93,6 +97,7 @@ kotlin {
         }
     }
 }
+
 dependencies {
-    androidRuntimeClasspath(libs.ui.tooling)
+    add("androidRuntimeClasspath", libs.ui.tooling)
 }
