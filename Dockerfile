@@ -11,7 +11,7 @@ ENV PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tool
 WORKDIR /workspace
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl unzip \
+    && apt-get install -y --no-install-recommends ca-certificates curl libatomic1 unzip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p "${ANDROID_HOME}/cmdline-tools" \
