@@ -7,6 +7,13 @@ internal actual object BackendConfig {
         get() {
             val protocol = if (window.location.protocol == "https:") "wss" else "ws"
             val host = window.location.hostname.ifBlank { "127.0.0.1" }
-            return "$protocol://$host:8080/table"
+            val isLocalHost = host == "localhost" || host == "127.0.0.1" || host == "::1"
+            val backendHost = if (isLocalHost && window.location.port != "8080") {
+                "$host:8080"
+            } else {
+                window.location.host.ifBlank { "$host:8080" }
+            }
+
+            return "$protocol://$backendHost/table"
         }
 }

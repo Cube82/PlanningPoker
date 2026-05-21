@@ -1,0 +1,11 @@
+.git
+.gradle
+.idea
+.kotlin
+androidApp/build
+build
+composeApp/build
+server/build
+shared/build
+kotlin-js-store
+local.properties

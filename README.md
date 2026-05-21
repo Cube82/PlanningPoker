@@ -92,10 +92,12 @@ If Gradle cannot find Java, make sure `JAVA_HOME` points to a valid JDK.
 - Android app: `./gradlew :androidApp:assembleDebug`
 - Android install with local backend reverse: `./gradlew :androidApp:installDebug`
 - Web app: `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
+- Web production distribution: `./gradlew :composeApp:wasmJsBrowserDistribution`
 - Server compile: `./gradlew :server:compileKotlin`
 - Server run: `./gradlew :server:run`
 - Server run with auto-restart on changes: `./gradlew :server:run --continuous`
 - Server distribution: `./gradlew :server:installDist`
+- Docker image: `docker build -t planning-poker .`
 
 On Windows, use `gradlew.bat` or `./gradlew` from PowerShell.
 
@@ -288,6 +290,43 @@ Behavior:
 - if `tableId` is present but `player` is missing, app redirects to lobby with that table preselected
 - if both are present, app tries to enter the table directly
 - unknown table ids are rejected
+
+## Deploying to Render
+
+The simplest production setup is one Render Web Service built from the repository `Dockerfile`.
+
+The Docker image:
+
+- builds the Compose Wasm production distribution
+- builds the Ktor server distribution
+- installs the Android SDK command line tools needed by the configured Android target during Gradle configuration
+- copies the web assets into `/app/public`
+- starts the Ktor server as the public web process
+
+Render setup:
+
+- Service type: `Web Service`
+- Runtime: `Docker`
+- Dockerfile path: `./Dockerfile`
+- Environment variables: none required for the MVP
+
+Runtime notes:
+
+- Render provides the `PORT` environment variable. The server reads it automatically and falls back to `8080` locally.
+- The web client connects to `/table` on the same host in production, using `wss` when the page is served over HTTPS.
+- WebSockets are served by the same Ktor process as the static frontend.
+
+Local Docker smoke test:
+
+```powershell
+docker build -t planning-poker .
+docker run --rm -p 8080:8080 planning-poker
+```
+
+Then open:
+
+- `http://localhost:8080`
+- `http://localhost:8080/#table/main`
 
 ## Troubleshooting
 
