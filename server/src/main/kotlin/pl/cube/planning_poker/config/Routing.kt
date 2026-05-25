@@ -1,7 +1,8 @@
 package pl.cube.planning_poker.config
 
 import io.ktor.server.application.Application
-import io.ktor.server.http.content.staticFiles
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondFile
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -25,11 +26,25 @@ private fun Route.frontendStaticContent() {
         return
     }
 
-    staticFiles("/", frontendDir) {
-        default("index.html")
-    }
+    get("{path...}") {
+        val path = call.parameters.getAll("path").orEmpty()
+        if (path.isEmpty()) {
+            call.respondFile(indexFile)
+            return@get
+        }
 
-    get("{...}") {
-        call.respondFile(indexFile)
+        val requestedFile = frontendDir.resolve(path.joinToString(File.separator)).canonicalFile
+        val canonicalFrontendDir = frontendDir.canonicalFile
+
+        if (!requestedFile.path.startsWith(canonicalFrontendDir.path + File.separator)) {
+            call.respond(HttpStatusCode.Forbidden)
+            return@get
+        }
+
+        if (requestedFile.isFile) {
+            call.respondFile(requestedFile)
+        } else {
+            call.respond(HttpStatusCode.NotFound)
+        }
     }
 }
